@@ -29,6 +29,7 @@
 #include "can0.h"
 
 uint8_t sendArray[4];
+uint8_t sendArray1[4];
 
 #define NVIC_EN0_INT19          0x00080000  // Interrupt 19 enable
 
@@ -64,10 +65,10 @@ void EndCritical(long sr);    // restore I bit to previous value
 void WaitForInterrupt(void);  // low power mode
 void (*PeriodicTask)(void);   // user function
 
-uint32_t Flag, Per;
-uint32_t Period;              // (1/clock) units
-uint32_t First;               // Timer0A first edge
-int32_t Done;                // set each rising
+uint32_t Flag, Flag1, Per, Per1;
+uint32_t Period, Period1;              // (1/clock) units
+uint32_t First, First1;               // Timer0A first edge
+int32_t Done, Done1;                // set each rising
 //------------TimerCapture_Init------------
 // Initialize Timer0A in edge time mode to request interrupts on
 // the rising edge of PB0 (CCP0).  The interrupt service routine
@@ -76,21 +77,20 @@ int32_t Done;                // set each rising
 // Output: none
 void TimerCapture_Init(void(*task)(void)){long sr;
   sr = StartCritical();
-	Flag = 0;
+	Flag = Flag1 = 0;
 	
   SYSCTL_RCGCTIMER_R |= 0x01;// activate timer0
   SYSCTL_RCGCGPIO_R |= 0x02; // activate port B
   while((SYSCTL_PRGPIO_R&0x0002) == 0){};// ready?
 
   PeriodicTask = task;             // user function 
-  GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
-	GPIO_PORTB_DIR_R |= 0x80;
-  GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
-	GPIO_PORTB_AFSEL_R &= ~0x80;      // enable alt funct on PB6
-  GPIO_PORTB_DEN_R |= 0xC0;        // enable digital I/O on PB6
+  GPIO_PORTB_DIR_R &= ~0xF0;       // make PB6 in
+  GPIO_PORTB_AFSEL_R |= 0xF0;      // enable alt funct on PB6
+  GPIO_PORTB_DEN_R |= 0xF0;        // enable digital I/O on PB6
                                    // configure PB6 as T0CCP0
-  GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x07000000;
-  GPIO_PORTB_AMSEL_R &= ~0xC0;     // disable analog functionality on PB6
+  GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0x0000FFFF)+0x77770000;
+  GPIO_PORTB_AMSEL_R &= ~0xF0;     // disable analog functionality on PB6
+		
   TIMER0_CTL_R &= ~TIMER_CTL_TAEN; // disable timer0A during setup
   TIMER0_CFG_R = TIMER_CFG_16_BIT; // configure for 16-bit timer mode
                                    // configure for capture mode, default down-count settings
@@ -106,6 +106,23 @@ void TimerCapture_Init(void(*task)(void)){long sr;
                                    // Timer0A=priority 2
   NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
   NVIC_EN0_R = NVIC_EN0_INT19;     // enable interrupt 19 in NVIC
+	
+	TIMER1_CTL_R &= ~TIMER_CTL_TAEN; // disable timer0A during setup
+  TIMER1_CFG_R = TIMER_CFG_16_BIT; // configure for 16-bit timer mode
+                                   // configure for capture mode, default down-count settings
+  TIMER1_TAMR_R = (TIMER_TAMR_TACMR|TIMER_TAMR_TAMR_CAP);
+                                   // configure for falling edge event
+  TIMER1_CTL_R &= 0;
+	TIMER1_CTL_R |= (TIMER_CTL_TAEVENT_BOTH);
+  TIMER1_TAILR_R = 0x0000FFFF;  // max start value
+	TIMER1_TAPR_R = 0xFF;							 // 23Prescale to max of 19.66 ms (echo 750 us + max 18.5 ms) 
+  TIMER1_IMR_R |= TIMER_IMR_CAEIM; // enable capture match interrupt
+  TIMER1_ICR_R = TIMER_ICR_CAECINT;// clear timer0A capture match flag
+  TIMER1_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 16-b, +edge timing, interrupts
+                                   // Timer0A=priority 2
+  NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFF00FF)|0x00004000; // top 3 bits
+  NVIC_EN0_R = NVIC_EN0_INT21;     // enable interrupt 21 in NVIC
+	
   EndCritical(sr);
 }
 
@@ -128,8 +145,36 @@ void Timer0A_Handler(void){
 		sendArray[1] = (Per&0x00FF0000)>>16;
 		sendArray[2] = (Per&0x0000FF00)>>8;
 		sendArray[3] = (Per&0x000000FF);
-		CAN0_SendData(sendArray);
+		
+		//Add a semaphore here
+		//CAN0_SendData(sendArray);
 		Flag = 0;
+	}
+}
+
+void Timer1A_Handler(void){
+  TIMER1_ICR_R = TIMER_ICR_CAECINT;// acknowledge timer0A capture match
+  Period1 = (First1 - TIMER1_TAR_R)&0xFFFFFF;// 24 bits, 12.5ns resolution
+  First1 = TIMER1_TAR_R;            // setup for next
+  Done1 = 1;
+	
+	if(Flag1 == 0) 
+	{
+		Flag1 = 1;
+	}
+	else
+	{
+		GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x08; // toggle PF2
+		Per1 = Period1;
+		Per1 = (Per1 * 332)/16;
+		sendArray1[0] = (Per1&0xFF000000)>>24;
+		sendArray1[1] = (Per1&0x00FF0000)>>16;
+		sendArray1[2] = (Per1&0x0000FF00)>>8;
+		sendArray1[3] = (Per1&0x000000FF);
+		
+		//Add a semaphore here
+		CAN0_SendData(sendArray1);
+		Flag1 = 0;
 	}
 }
 

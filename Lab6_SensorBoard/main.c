@@ -31,7 +31,8 @@
 #include "ADCTrigger.h"
 
 #define PB6  (*((volatile unsigned long *)0x40005100))
-#define PB7  (*((volatile unsigned long *)0x40005200))
+#define PB7  (*((volatile unsigned long *)0x40004200))
+#define PA6	 (*((volatile unsigned long *)0x40004100))
 	
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
@@ -92,11 +93,14 @@ void Timer2A_Handler(void){
 //		GPIO_PORTB_AFSEL_R &= ~0x40; // regular port function
 //		GPIO_PORTB_DIR_R |= 0x40;    // make PD3-0 out
 //		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x00000000;
-		PB7 = 0x00;
-		PB7 = 0x80;
+//		PB7 = 0x00;
+//		PB7 = 0x80;
+//		Timer4A_Wait(800);	// 10 us
+//		PB7 = 0x00;
+		PA6 = 0x00;
+		PA6 = 0x40;
 		Timer4A_Wait(800);	// 10 us
-		PB7 = 0x00;
-		
+		PA6 = 0x00;		
 //		GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
 //		GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
 //		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x07000000;
@@ -109,6 +113,8 @@ void Timer2A_Handler(void){
 }
 
 int main(void){
+	volatile uint32_t delay;
+	
 	PLL_Init();
 	CAN0_Open();
                                    // activate port F
@@ -121,6 +127,14 @@ int main(void){
                                    // configure PF2 as GPIO
   GPIO_PORTF_PCTL_R = (GPIO_PORTF_PCTL_R&0xFFFFF0FF)+0x00000000;
   GPIO_PORTF_AMSEL_R = 0;          // disable analog functionality on PF
+	
+	SYSCTL_RCGCGPIO_R  |= 0x01;
+	delay = SYSCTL_RCGCGPIO_R;      // 2) allow time for clock to stabilize
+  delay = SYSCTL_RCGCGPIO_R;
+	GPIO_PORTA_DIR_R |= 0x40;  			// 3.11) make PA6 output
+  GPIO_PORTA_AFSEL_R &= ~0x40; 		// 4.11) disable alternate function on PA6
+  GPIO_PORTA_DEN_R |= 0x40;  			// 5.11) enable digital I/O on PA6
+  GPIO_PORTA_AMSEL_R = 0; 				// 6.11) disable analog functionality on PA6	
 		
 	DisableInterrupts();
 	Init_Timer4A();
