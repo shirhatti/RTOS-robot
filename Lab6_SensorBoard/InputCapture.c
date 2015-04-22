@@ -84,11 +84,13 @@ void TimerCapture_Init(void(*task)(void)){long sr;
 
   PeriodicTask = task;             // user function 
   GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
+	GPIO_PORTB_DIR_R |= 0x80;
   GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
-  GPIO_PORTB_DEN_R |= 0x40;        // enable digital I/O on PB6
+	GPIO_PORTB_AFSEL_R &= ~0x80;      // enable alt funct on PB6
+  GPIO_PORTB_DEN_R |= 0xC0;        // enable digital I/O on PB6
                                    // configure PB6 as T0CCP0
   GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x07000000;
-  GPIO_PORTB_AMSEL_R &= ~0x40;     // disable analog functionality on PB6
+  GPIO_PORTB_AMSEL_R &= ~0xC0;     // disable analog functionality on PB6
   TIMER0_CTL_R &= ~TIMER_CTL_TAEN; // disable timer0A during setup
   TIMER0_CFG_R = TIMER_CFG_16_BIT; // configure for 16-bit timer mode
                                    // configure for capture mode, default down-count settings
@@ -119,7 +121,9 @@ void Timer0A_Handler(void){
 	}
 	else
 	{
+		GPIO_PORTF_DATA_R = GPIO_PORTF_DATA_R^0x04; // toggle PF2
 		Per = Period;
+		Per = (Per * 332)/16;
 		sendArray[0] = (Per&0xFF000000)>>24;
 		sendArray[1] = (Per&0x00FF0000)>>16;
 		sendArray[2] = (Per&0x0000FF00)>>8;

@@ -31,6 +31,7 @@
 #include "ADCTrigger.h"
 
 #define PB6  (*((volatile unsigned long *)0x40005100))
+#define PB7  (*((volatile unsigned long *)0x40005200))
 	
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
@@ -88,17 +89,17 @@ void Timer2A_Handler(void){
 		counter = 1;
 		
 		sr = StartCritical();
-		GPIO_PORTB_AFSEL_R &= ~0x40; // regular port function
-		GPIO_PORTB_DIR_R |= 0x40;    // make PD3-0 out
-		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x00000000;
-		PB6 = 0x00;
-		PB6 = 0x40;
+//		GPIO_PORTB_AFSEL_R &= ~0x40; // regular port function
+//		GPIO_PORTB_DIR_R |= 0x40;    // make PD3-0 out
+//		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x00000000;
+		PB7 = 0x00;
+		PB7 = 0x80;
 		Timer4A_Wait(800);	// 10 us
-		PB6 = 0x00;
+		PB7 = 0x00;
 		
-		GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
-		GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
-		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x07000000;
+//		GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
+//		GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
+//		GPIO_PORTB_PCTL_R = (GPIO_PORTB_PCTL_R&0xF0FFFFFF)+0x07000000;
 		
 		EndCritical(sr);
 	}
@@ -124,7 +125,7 @@ int main(void){
 	DisableInterrupts();
 	Init_Timer4A();
 	Init_Timer2A(800000);
-	ADC0_InitTimer3ATriggerSeq3PD3(800000);
+//	ADC0_InitTimer3ATriggerSeq3PD3(800000);
 
 #ifdef DEBUG		
 	SYSCTL_RCGCGPIO_R |= 0x02; // activate port B
