@@ -49,7 +49,7 @@ void CAN0_GetMail(uint8_t data[4]);
 void CAN0_Open(void);
 
 // send 4 bytes of data to other microcontroller 
-void CAN0_SendData(uint8_t data[4]);
+void CAN0_SendData(uint8_t data[4], uint8_t id);
 
 
 

@@ -117,15 +117,15 @@ void CAN0_Open(void){uint32_t volatile delay;
   CANIntEnable(CAN0_BASE, CAN_INT_MASTER | CAN_INT_ERROR | CAN_INT_STATUS);
 // Set up filter to receive these IDs
 // in this case there is just one type, but you could accept multiple ID types
-  CAN0_Setup_Message_Object(RCV_ID, MSG_OBJ_RX_INT_ENABLE, 4, NULL, RCV_ID, MSG_OBJ_TYPE_RX);
+  //CAN0_Setup_Message_Object(RCV_ID, MSG_OBJ_RX_INT_ENABLE, 4, NULL, RCV_ID, MSG_OBJ_TYPE_RX);
   NVIC_EN1_R = (1 << (INT_CAN0 - 48)); //IntEnable(INT_CAN0);
   return;
 }
 
 // send 4 bytes of data to other microcontroller 
-void CAN0_SendData(uint8_t data[4]){
+void CAN0_SendData(uint8_t data[4], uint8_t id){
 // in this case there is just one type, but you could accept multiple ID types
-  CAN0_Setup_Message_Object(XMT_ID, NULL, 4, data, XMT_ID, MSG_OBJ_TYPE_TX);
+  CAN0_Setup_Message_Object(id, NULL, 4, data, id, MSG_OBJ_TYPE_TX);
 }
 
 // Returns true if receive data is available

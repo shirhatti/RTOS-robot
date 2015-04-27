@@ -85,7 +85,7 @@ void Timer2A_Handler(void){
 	
 	TIMER2_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer2A timeout
 	
-	if(counter == 100)
+	if(counter == 50)
 	{
 		counter = 1;
 		
@@ -138,7 +138,8 @@ int main(void){
 		
 	DisableInterrupts();
 	Init_Timer4A();
-	Init_Timer2A(800000);
+	Timer4A_Wait(80000000); //wait 1 sec
+	Init_Timer2A(80000);
 //	ADC0_InitTimer3ATriggerSeq3PD3(800000);
 
 #ifdef DEBUG		
@@ -151,11 +152,6 @@ int main(void){
   GPIO_PORTB_PCTL_R = ~0x0000FFFF;
   GPIO_PORTB_AMSEL_R &= ~0x40;;      // disable analog functionality on PF	
 		
-	PB6 = 0x00;
-	PB6 = 0x40;
-	Timer4A_Wait(80000);
-	PB6 = 0x00;
-	
 	GPIO_PORTB_DIR_R &= ~0x40;       // make PB6 in
   GPIO_PORTB_AFSEL_R |= 0x40;      // enable alt funct on PB6
   GPIO_PORTB_DEN_R |= 0x40;        // enable digital I/O on PB6

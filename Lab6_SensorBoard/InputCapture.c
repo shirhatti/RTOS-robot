@@ -79,7 +79,7 @@ void TimerCapture_Init(void(*task)(void)){long sr;
   sr = StartCritical();
 	Flag = Flag1 = 0;
 	
-  SYSCTL_RCGCTIMER_R |= 0x01;// activate timer0
+  SYSCTL_RCGCTIMER_R |= 0x03;// activate timer0
   SYSCTL_RCGCGPIO_R |= 0x02; // activate port B
   while((SYSCTL_PRGPIO_R&0x0002) == 0){};// ready?
 
@@ -105,7 +105,7 @@ void TimerCapture_Init(void(*task)(void)){long sr;
   TIMER0_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 16-b, +edge timing, interrupts
                                    // Timer0A=priority 2
   NVIC_PRI4_R = (NVIC_PRI4_R&0x00FFFFFF)|0x40000000; // top 3 bits
-  NVIC_EN0_R = NVIC_EN0_INT19;     // enable interrupt 19 in NVIC
+  NVIC_EN0_R |= NVIC_EN0_INT19;     // enable interrupt 19 in NVIC
 	
 	TIMER1_CTL_R &= ~TIMER_CTL_TAEN; // disable timer0A during setup
   TIMER1_CFG_R = TIMER_CFG_16_BIT; // configure for 16-bit timer mode
@@ -121,7 +121,7 @@ void TimerCapture_Init(void(*task)(void)){long sr;
   TIMER1_CTL_R |= TIMER_CTL_TAEN;  // enable timer0A 16-b, +edge timing, interrupts
                                    // Timer0A=priority 2
   NVIC_PRI5_R = (NVIC_PRI5_R&0xFFFF00FF)|0x00004000; // top 3 bits
-  NVIC_EN0_R = NVIC_EN0_INT21;     // enable interrupt 21 in NVIC
+  NVIC_EN0_R |= NVIC_EN0_INT21;     // enable interrupt 21 in NVIC
 	
   EndCritical(sr);
 }
@@ -147,7 +147,7 @@ void Timer0A_Handler(void){
 		sendArray[3] = (Per&0x000000FF);
 		
 		//Add a semaphore here
-		//CAN0_SendData(sendArray);
+		CAN0_SendData(sendArray, 1);
 		Flag = 0;
 	}
 }
@@ -173,7 +173,7 @@ void Timer1A_Handler(void){
 		sendArray1[3] = (Per1&0x000000FF);
 		
 		//Add a semaphore here
-		CAN0_SendData(sendArray1);
+		CAN0_SendData(sendArray1, 2);
 		Flag1 = 0;
 	}
 }
