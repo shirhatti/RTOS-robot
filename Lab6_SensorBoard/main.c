@@ -33,7 +33,9 @@
 #define PB6  (*((volatile unsigned long *)0x40005100))
 #define PB7  (*((volatile unsigned long *)0x40004200))
 #define PA6	 (*((volatile unsigned long *)0x40004100))
-	
+
+#define NVIC_EN2_INT92	0x10000000	// Interrupt 92 enable
+
 void DisableInterrupts(void); // Disable interrupts
 void EnableInterrupts(void);  // Enable interrupts
 long StartCritical (void);    // previous I bit, disable interrupts
@@ -51,39 +53,40 @@ void UserTask(void){
 }
 
 static int counter;
-void Init_Timer2A(uint32_t period) {
+void Init_Timer5A(uint32_t period) {
 	long sr;
 	volatile unsigned long delay;
 	
 	sr = StartCritical();
 	counter = 0;
-  SYSCTL_RCGCTIMER_R |= 0x04;
+  SYSCTL_RCGCTIMER_R |= 0x20;
 	
   delay = SYSCTL_RCGCTIMER_R;
 	delay = SYSCTL_RCGCTIMER_R;
 	
-  TIMER2_CTL_R &= ~TIMER_CTL_TAEN; // 1) disable timer1A during setup
+  TIMER5_CTL_R &= ~TIMER_CTL_TAEN; // 1) disable timer1A during setup
                                    // 2) configure for 32-bit timer mode
-  TIMER2_CFG_R = TIMER_CFG_32_BIT_TIMER;
+  TIMER5_CFG_R = TIMER_CFG_32_BIT_TIMER;
                                    // 3) configure for periodic mode, default down-count settings
-  TIMER2_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
-  TIMER2_TAILR_R = period - 1;     // 4) reload value
+  TIMER5_TAMR_R = TIMER_TAMR_TAMR_PERIOD;
+  TIMER5_TAILR_R = period - 1;     // 4) reload value
                                    // 5) clear timer1A timeout flag
-  TIMER2_ICR_R = TIMER_ICR_TATOCINT;
-  TIMER2_IMR_R |= TIMER_IMR_TATOIM;// 6) arm timeout interrupt
+  TIMER5_ICR_R = TIMER_ICR_TATOCINT;
+  TIMER5_IMR_R |= TIMER_IMR_TATOIM;// 6) arm timeout interrupt
 								   // 7) priority shifted to bits 31-29 for timer2A
-  NVIC_PRI5_R = (NVIC_PRI5_R&0x00FFFFFF)|(1 << 29);	
-  NVIC_EN0_R = NVIC_EN0_INT23;     // 8) enable interrupt 23 in NVIC
-  TIMER2_TAPR_R = 0;
-  TIMER2_CTL_R |= TIMER_CTL_TAEN;  // 9) enable timer2A
-	
+  NVIC_PRI23_R = (NVIC_PRI23_R&0xFFFFFF00)|(1 << 5);	
+  NVIC_EN2_R = NVIC_EN2_INT92;     // 8) enable interrupt 23 in NVIC
+  TIMER5_TAPR_R = 0;
+  TIMER5_CTL_R |= TIMER_CTL_TAEN;  // 9) enable timer2A
+	//page 155
+	//page 104 //interrupt number 92 = priority 23
   EndCritical(sr);
 }
 
-void Timer2A_Handler(void){ 
+void Timer5A_Handler(void){ 
 	unsigned long sr;
 	
-	TIMER2_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer2A timeout
+	TIMER5_ICR_R = TIMER_ICR_TATOCINT;// acknowledge timer2A timeout
 	
 	if(counter == 50)
 	{
@@ -112,6 +115,36 @@ void Timer2A_Handler(void){
 	}
 }
 
+void Switch_Init(void){  
+	unsigned long volatile delay;
+  delay = SYSCTL_RCGC2_R;
+  GPIO_PORTA_DIR_R &= ~0x0C;    // (c) make PA4,0 in (built-in button)
+  GPIO_PORTA_AFSEL_R &= ~0x0C;  //     disable alt funct on PA4,0
+  GPIO_PORTA_DEN_R |= 0x0C;     //     enable digital I/O on PA4,0
+//  GPIO_PORTF_PCTL_R &= ~0x0000000F; //  configure PA4,0 as GPIO
+  GPIO_PORTA_AMSEL_R &= ~0x0C;  //     disable analog functionality on PA4,0
+  GPIO_PORTA_PUR_R |= 0x0C;     //     enable weak pull-up on PF4,0
+  GPIO_PORTA_IS_R &= ~0x0C;     // (d) PA4,PA0 is edge-sensitive
+  GPIO_PORTA_IBE_R &= ~0x0C;    //     PA4,PA0 is not both edges
+  GPIO_PORTA_IEV_R &= ~0x0C;    //     PA4,PA0 falling edge event
+  GPIO_PORTA_ICR_R = 0x0C;      // (e) clear flags 4,0
+  GPIO_PORTA_IM_R |= 0x0C;      // (f) arm interrupt on PA4,PF0
+  NVIC_PRI0_R = (NVIC_PRI0_R&0xFFFFFF00)|0x00000040; // (g) priority 2
+  NVIC_EN0_R = 0x00000001;      // (h) enable interrupt 30 in NVIC
+}
+
+uint8_t switchPressed[] = {0,0,0,1};
+void GPIOPortA_Handler(void){ // called on touch of either SW1 or SW2
+  if(GPIO_PORTA_RIS_R&0x04){  // SW2 touch
+    GPIO_PORTA_ICR_R = 0x04;  // acknowledge flag0
+		CAN0_SendData(switchPressed, 5);
+  }
+  if(GPIO_PORTA_RIS_R&0x08){  // SW1 touch
+    GPIO_PORTA_ICR_R = 0x08;  // acknowledge flag4
+		CAN0_SendData(switchPressed, 6);
+  }
+}
+
 int main(void){
 	volatile uint32_t delay;
 	
@@ -135,11 +168,12 @@ int main(void){
   GPIO_PORTA_AFSEL_R &= ~0x40; 		// 4.11) disable alternate function on PA6
   GPIO_PORTA_DEN_R |= 0x40;  			// 5.11) enable digital I/O on PA6
   GPIO_PORTA_AMSEL_R = 0; 				// 6.11) disable analog functionality on PA6	
-		
+	Switch_Init();
+	
 	DisableInterrupts();
 	Init_Timer4A();
 	Timer4A_Wait(80000000); //wait 1 sec
-	Init_Timer2A(80000);
+	Init_Timer5A(80000);
 //	ADC0_InitTimer3ATriggerSeq3PD3(800000);
 
 #ifdef DEBUG		
