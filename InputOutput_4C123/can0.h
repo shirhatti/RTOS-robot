@@ -41,7 +41,7 @@
 
 extern uint32_t button1Pressed;
 extern uint32_t button2Pressed;
-extern uint32_t Mailbox, Mailbox2, Mailbox3, Mailbox4;
+extern uint32_t Mailbox, Mailbox2, Mailbox3, Mailbox4, Mailbox5, Mailbox6;
 
 // Returns true if receive data is available
 //         false if no receive data ready
