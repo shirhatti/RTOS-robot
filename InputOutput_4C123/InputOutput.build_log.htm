@@ -1,0 +1,59 @@
+<html>
+<body>
+<pre>
+<h1>µVision Build Log</h1>
+<h2>Project:</h2>
+C:\RTOS-robot\InputOutput_4C123\InputOutput.uvproj
+Project File Date:  05/04/2015
+
+<h2>Output:</h2>
+Rebuild target 'InputOutput'
+assembling startup.s...
+compiling InputOutput.c...
+InputOutput.c(13): warning:  #177-D: variable "ROutput" was declared but never referenced
+  static uint32_t ROutput, LOutput;
+InputOutput.c(13): warning:  #177-D: variable "LOutput" was declared but never referenced
+  static uint32_t ROutput, LOutput;
+InputOutput.c: 2 warnings, 0 errors
+compiling ADC.c...
+ADC.c(245): warning:  #177-D: variable "i" was declared but never referenced
+        static int i=0;
+ADC.c: 1 warning, 0 errors
+compiling can0.c...
+can0.c(176): warning:  #550-D: variable "temp" was set but never used
+        unsigned long temp;
+can0.c: 1 warning, 0 errors
+compiling can.c...
+compiling InputCapture.c...
+compiling interrupt.c...
+compiling MainCAN.c...
+compiling PLL.c...
+compiling PWM.c...
+PWM.c(37): warning:  #550-D: variable "delay" was set but never used
+        unsigned long delay;
+PWM.c: 1 warning, 0 errors
+compiling ST7735.c...
+compiling TIMER.c...
+TIMER.c(199): warning:  #550-D: variable "delay" was set but never used
+        int delay;
+TIMER.c(13): warning:  #550-D: variable "usedTimers" was set but never used
+  static int usedTimers[12];
+TIMER.c: 2 warnings, 0 errors
+compiling fixedpointmath.c...
+linking...
+Program Size: Code=7268 RO-data=2068 RW-data=188 ZI-data=1228  
+".\InputOutput.axf" - 0 Error(s), 7 Warning(s).
+Load "C:\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
+Connecting: Mode=JTAG, Speed=1000000Hz
+Erase Done.
+Programming Done.
+Verify OK.
+</pre>
+</body>
+</html>
+rget DLL has been cancelled
+Load "C:\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
+Connecting: Mode=JTAG, Speed=1000000Hz
+Erase Done.
+Programming Done.
+Verify OK.

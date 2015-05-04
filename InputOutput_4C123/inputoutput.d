@@ -1,0 +1,11 @@
+.\inputoutput.o: InputOutput.c
+.\inputoutput.o: tm4c123gh6pm.h
+.\inputoutput.o: C:\Keil\ARM\ARMCC\bin\..\include\stdint.h
+.\inputoutput.o: ST7735.h
+.\inputoutput.o: ADC.h
+.\inputoutput.o: UART.h
+.\inputoutput.o: C:\Keil\ARM\ARMCC\bin\..\include\string.h
+.\inputoutput.o: ifdef.h
+.\inputoutput.o: can0.h
+.\inputoutput.o: PWM.h
+.\inputoutput.o: PLL.h
