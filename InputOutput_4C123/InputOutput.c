@@ -1,9 +1,6 @@
 #include "tm4c123gh6pm.h"
 #include "ST7735.h"
 #include "ADC.h"
-#include "UART.h"
-#include <string.h> 
-#include "ifdef.h"
 #include "can0.h"
 #include "PWM.h"
 #include "PLL.h"
