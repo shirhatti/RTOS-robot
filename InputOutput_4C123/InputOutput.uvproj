@@ -441,11 +441,6 @@
               <FilePath>.\interrupt.c</FilePath>
             </File>
             <File>
-              <FileName>MainCAN.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\MainCAN.c</FilePath>
-            </File>
-            <File>
               <FileName>PLL.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\PLL.c</FilePath>
@@ -459,11 +454,6 @@
               <FileName>ST7735.c</FileName>
               <FileType>1</FileType>
               <FilePath>.\ST7735.c</FilePath>
-            </File>
-            <File>
-              <FileName>TIMER.c</FileName>
-              <FileType>1</FileType>
-              <FilePath>.\TIMER.c</FilePath>
             </File>
             <File>
               <FileName>fixedpointmath.c</FileName>

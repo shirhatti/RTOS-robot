@@ -3,62 +3,58 @@
 <pre>
 <h1>µVision Build Log</h1>
 <h2>Project:</h2>
-C:\Users\Nelson\Documents\University of Texas\Spring 2015\E E 445M\RTOS-robot\InputOutput_4C123\InputOutput.uvproj
-Project File Date:  05/04/2015
+C:\RTOS-robot\InputOutput_4C123\InputOutput.uvproj
+Project File Date:  05/05/2015
 
 <h2>Output:</h2>
 Build target 'InputOutput'
-compiling ADC.c...
+compiling InputOutput.c...
+InputOutput.c(12): warning:  #177-D: variable "ROutput" was declared but never referenced
+  static uint32_t ROutput, LOutput;
+InputOutput.c(12): warning:  #177-D: variable "LOutput" was declared but never referenced
+  static uint32_t ROutput, LOutput;
+InputOutput.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=9120 RO-data=2052 RW-data=360 ZI-data=1136  
-".\InputOutput.axf" - 0 Error(s), 0 Warning(s).
-Load "C:\\Users\\Nelson\\Documents\\University of Texas\\Spring 2015\\E E 445M\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
+Program Size: Code=9668 RO-data=2052 RW-data=364 ZI-data=1132  
+".\InputOutput.axf" - 0 Error(s), 2 Warning(s).
+Load "C:\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
 Connecting: Mode=JTAG, Speed=1000000Hz
 Erase Done.
 Programming Done.
 Verify OK.
-ic uint32_t ROutput, LOutput;
-InputOutput.c: 3 warnings, 0 errors
-linking...
-Program Size: Code=9124 RO-data=2052 RW-data=360 ZI-data=1136  
-".\InputOutput.axf" - 0 Error(s), 3 Warning(s).
-Load "C:\\Users\\Nelson\\Documents\\University of Texas\\Spring 2015\\E E 445M\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
-Connecting: Mode=JTAG, Speed=1000000Hz
-Erase Done.
-Programming Done.
-Verify OK.
-ogramming Done.
-Verify OK.
- never used
+</pre>
+</body>
+</html>
+iling PWM.c...
+PWM.c(37): warning:  #550-D: variable "delay" was set but never used
         unsigned long delay;
 PWM.c: 1 warning, 0 errors
 compiling ST7735.c...
 compiling fixedpointmath.c...
 linking...
-Program Size: Code=9228 RO-data=2052 RW-data=360 ZI-data=1136  
-".\InputOutput.axf" - 0 Error(s), 5 Warning(s).
-Load "C:\\Users\\Nelson\\Documents\\University of Texas\\Spring 2015\\E E 445M\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
+Program Size: Code=9668 RO-data=2052 RW-data=364 ZI-data=1132  
+".\InputOutput.axf" - 0 Error(s), 4 Warning(s).
+Load "C:\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
 Connecting: Mode=JTAG, Speed=1000000Hz
 Erase Done.
 Programming Done.
 Verify OK.
-defined (by timer.o and inputoutput.o).
-.\InputOutput.axf: Error: L6200E: Symbol UserTask multiply defined (by maincan.o and inputoutput.o).
+ash Download failed  -  Target DLL has been cancelled
+Load "C:\\RTOS-robot\\InputOutput_4C123\\InputOutput.axf" 
+Connecting: Mode=JTAG, Speed=1000000Hz
+Erase Done.
+Programming Done.
+Verify OK.
+(by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer1A_Handler multiply defined (by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer1B_Handler multiply defined (by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer3A_Handler multiply defined (by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer3B_Handler multiply defined (by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer4A_Handler multiply defined (by timer.o and inputcapture.o).
+.\InputOutput.axf: Error: L6200E: Symbol Timer5A_Handler multiply defined (by timer.o and inputoutput.o).
 .\InputOutput.axf: Error: L6200E: Symbol PeriodicTask multiply defined (by timer.o and inputcapture.o).
 Not enough information to list image symbols.
 Not enough information to list the image map.
-Finished: 2 information, 0 warning and 10 error messages.
-".\InputOutput.axf" - 10 Error(s), 3 Warning(s).
-Target not created
-);
-InputCapture.c: 0 warnings, 8 errors
-".\InputOutput.axf" - 11 Error(s), 3 Warning(s).
-Target not created
-            CAN0_SendData(sendArray5, 6);
-InputCapture.c(382): error:  #140: too many arguments in function call
-                CAN0_SendData(sendArray6, 7);
-InputCapture.c(408): error:  #140: too many arguments in function call
-                CAN0_SendData(sendArray7, 8);
-InputCapture.c: 0 warnings, 8 errors
-".\InputOutput.axf" - 11 Error(s), 6 Warning(s).
+Finished: 2 information, 0 warning and 9 error messages.
+".\InputOutput.axf" - 9 Error(s), 6 Warning(s).
 Target not created

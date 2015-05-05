@@ -101,18 +101,18 @@ void Switch_Init(void){
  unsigned long volatile delay;
   SYSCTL_RCGCGPIO_R |= 0x10;
   delay = SYSCTL_RCGC2_R;
-  GPIO_PORTE_DIR_R &= ~0x06;    // (c) make PA4,0 in (built-in button)
-  GPIO_PORTE_AFSEL_R &= ~0x06;  //     disable alt funct on PA4,0
-  GPIO_PORTE_DEN_R |= 0x06;     //     enable digital I/O on PA4,0
+  GPIO_PORTE_DIR_R &= ~0x0C;    // (c) make PA4,0 in (built-in button)
+  GPIO_PORTE_AFSEL_R &= ~0x0C;  //     disable alt funct on PA4,0
+  GPIO_PORTE_DEN_R |= 0x0C;     //     enable digital I/O on PA4,0
 //  GPIO_PORTF_PCTL_R &= ~0x0000000F; //  configure PA4,0 as GPIO
-  GPIO_PORTE_AMSEL_R &= ~0x06;  //     disable analog functionality on PA4,0
-  GPIO_PORTE_PUR_R |= 0x06;     //     enable weak pull-up on PF4,0
-  GPIO_PORTE_IS_R &= ~0x06;     // (d) PA4,PA0 is edge-sensitive
-  GPIO_PORTE_IBE_R &= ~0x06;    //     PA4,PA0 is not both edges
-  GPIO_PORTE_IEV_R &= ~0x06;    //     PA4,PA0 falling edge event
-  GPIO_PORTE_ICR_R = 0x06;      // (e) clear flags 4,0
-  GPIO_PORTE_IM_R |= 0x06;      // (f) arm interrupt on PA4,PF0
-  NVIC_PRI1_R = (NVIC_PRI1_R&0xFFFF00FF)|0x00004000; // (g) priority 2
+  GPIO_PORTE_AMSEL_R &= ~0x0C;  //     disable analog functionality on PA4,0
+  GPIO_PORTE_PUR_R |= 0x0C;     //     enable weak pull-up on PF4,0
+  GPIO_PORTE_IS_R &= ~0x0C;     // (d) PA4,PA0 is edge-sensitive
+  GPIO_PORTE_IBE_R &= ~0x0C;    //     PA4,PA0 is not both edges
+  GPIO_PORTE_IEV_R &= ~0x0C;    //     PA4,PA0 falling edge event
+  GPIO_PORTE_ICR_R = 0x0C;      // (e) clear flags 4,0
+  GPIO_PORTE_IM_R |= 0x0C;      // (f) arm interrupt on PA4,PF0
+  NVIC_PRI1_R = (NVIC_PRI1_R&0xFFFFFF00)|0x00000040; // (g) priority 2
   NVIC_EN0_R = 0x00000001 << 4;      // (h) enable interrupt 30 in NVIC
 }
 
@@ -122,8 +122,8 @@ void GPIOPortE_Handler(void){ // called on touch of either SW1 or SW2
 		buttonL = 1;
 //      CAN0_SendData(switchPressed, 5);
   }
-  if(GPIO_PORTE_RIS_R&0x02){  // SW1 touch
-    GPIO_PORTE_ICR_R = 0x02;  // acknowledge flag4
+  if(GPIO_PORTE_RIS_R&0x08){  // SW1 touch
+    GPIO_PORTE_ICR_R = 0x08;  // acknowledge flag4
 		buttonR = 1;
 //      CAN0_SendData(switchPressed, 6);
   }
@@ -207,17 +207,21 @@ int main(void){
 		printSensorValues(0);
 		if(buttonL) {
 			printSensorValues(6);
-			ST7735_SetCursor(0,1);ST7735_OutString("ButtonL");
+			ControlMotors(35000,35000);
+			ST7735_SetCursor(0,8);ST7735_OutString("Buttonback");
 			buttonL = 0;
+			for(i = 0; i < 1440000; i++);
 		}
 		if(buttonR) {
 			printSensorValues(6);
+			ControlMotors(35000,35000);
 			ST7735_SetCursor(0,1);ST7735_OutString("ButtonR");
 			buttonR = 0;
+			for(i = 0; i < 1440000; i++);
 		}
 		
 		if (Ping1 < 18) {
-			ControlMotors(40000, 40000);
+			//ControlMotors(40000, 40000);
 			ST7735_SetCursor(0,1);
 			ST7735_OutString("Stopped");
 			printSensorValues(3);
@@ -248,15 +252,15 @@ int main(void){
 		//	ControlMotors(40000,40000);
 		}
 		else if(IR_L < 1500 && IR_R < 1500) {
-			ControlMotors(70000,70000);
+			ControlMotors(70000,65000);
 			ST7735_SetCursor(0,8);ST7735_OutString("FO");
 		}
 		else if(IR_L < IR_R) {
-			ControlMotors(75000,50000);
+			ControlMotors(70000,50000);
 			ST7735_SetCursor(0,8);ST7735_OutString("LE");
 		}
 		else if(IR_R < IR_L) {
-			ControlMotors(50000,75000);
+			ControlMotors(70000,72000);
 			ST7735_SetCursor(0,8);ST7735_OutString("RI");
 		}
 	}
