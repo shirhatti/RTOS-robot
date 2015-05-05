@@ -7,7 +7,7 @@
 #include "InputCapture.h"
 
 uint32_t IR_L, IR_R;
-uint32_t Ping1, Ping2, Ping3, Ping4;
+uint32_t Ping1 = 4000000, Ping2= 9900000, Ping3=9900000, Ping4;
 static uint32_t ROutput, LOutput;
 int i;
 
@@ -202,36 +202,47 @@ int main(void){
 	while(1) {
 		getSensorValues();
 		printSensorValues(0);
-		if (Ping1 < 10) {
+		if (Ping1 < 18) {
 			ControlMotors(40000, 40000);
 			ST7735_SetCursor(0,1);
 			ST7735_OutString("Stopped");
 			printSensorValues(3);
-			while(1) {
+//			while(1) {
 				ST7735_SetCursor(0,1);ST7735_OutString("Stopped");
 				getSensorValues();
 				printSensorValues(0);
-			}
+//			}
 			if(IR_L > IR_R) {
-				ControlMotors(40000,35000);
+				ControlMotors(35000,35000);
 				ST7735_SetCursor(0,8);ST7735_OutString("BL");
 			}
 			else {
-				ControlMotors(35000,40000);
+				ControlMotors(35000,35000);
 				ST7735_SetCursor(0,8);ST7735_OutString("BR");
 			}
 			for(i = 0; i < 1440000; i++);
+		}
+		else if (((Ping2 > 80) != (Ping3 > 80)) && (Ping1 < 40)) {
+			if (Ping2>80) {
+				//spot turn right
+				ControlMotors(20000, 60000);
+			}
+			if (Ping3>80) {
+				//spot turn left
+				ControlMotors(60000, 20000); 
+			}
+		//	ControlMotors(40000,40000);
 		}
 		else if(IR_L < 1500 && IR_R < 1500) {
 			ControlMotors(70000,70000);
 			ST7735_SetCursor(0,8);ST7735_OutString("FO");
 		}
 		else if(IR_L < IR_R) {
-			ControlMotors(70000,55000);
+			ControlMotors(75000,50000);
 			ST7735_SetCursor(0,8);ST7735_OutString("LE");
 		}
 		else if(IR_R < IR_L) {
-			ControlMotors(55000,70000);
+			ControlMotors(50000,75000);
 			ST7735_SetCursor(0,8);ST7735_OutString("RI");
 		}
 	}

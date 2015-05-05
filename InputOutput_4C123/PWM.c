@@ -172,14 +172,14 @@ void InitMotors(void){
 void ControlMotors(uint32_t MotorR, uint32_t MotorL){
 	if(MotorR > 40000){
 		RightMotorForward();
-		if(MotorR > 80000) MotorR = 79999;
+		if(MotorR >= 80000) MotorR = 79999;
 		PWM0B_Duty((MotorR-40000));
 	}else{
 		RightMotorBackward();
 		PWM0B_Duty(MotorR);
 	}
 	if(MotorL > 40000){
-		if(MotorL> 80000) MotorL = 79999;
+		if(MotorL>= 80000) MotorL = 79999;
 		LeftMotorForward();
 		PWM0A_Duty((MotorL - 40000));
 	}else{
