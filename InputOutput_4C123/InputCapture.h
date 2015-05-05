@@ -24,6 +24,8 @@
 
 // external signal connected to PB6 (T0CCP0) (trigger on rising edge)
 
+extern uint32_t IR_L, IR_R, Ping1, Ping2, Ping3, Ping4;
+
 //------------TimerCapture_Init------------
 // Initialize Timer0A in edge time mode to request interrupts on
 // the rising edge of PB0 (CCP0).  The interrupt service routine
@@ -31,3 +33,7 @@
 // Input: task is a pointer to a user function
 // Output: none
 void TimerCapture_Init(void(*task)(void));
+
+void Init_Timer4A(void);
+
+void Timer4A_Wait(unsigned long delay);

@@ -273,6 +273,7 @@ void ADC0_InitTimer3ATriggerSeq3PD3(uint32_t period){
   ADC0_ACTSS_R |= 0x08;         // 10) enable sample sequencer 3
   NVIC_PRI4_R = (NVIC_PRI4_R&0xFFFF00FF)|0x00004000; // 11)priority 2
   NVIC_EN0_R = 1<<17;           // 12) enable interrupt 17 in NVIC
+//	ADC0_SPC_R=0x00;
 }
 
 void ADC0_InitTimer3BTriggerSeq2PD2(uint32_t period){
@@ -305,6 +306,7 @@ void ADC0_InitTimer3BTriggerSeq2PD2(uint32_t period){
   ADC1_ACTSS_R |= 0x08;         // 10) enable sample sequencer 3
 	NVIC_PRI12_R = (NVIC_PRI12_R&0x00FFFFFF)|0x40000000; //priority 2
 	NVIC_EN1_R |= 0x00080000;			//51
+//	ADC1_SPC_R=0x08;
 }
 
 volatile uint32_t ADCvalue, ADCvalue2;
@@ -319,4 +321,5 @@ volatile uint32_t ADCvalue2;
 void ADC1Seq3_Handler(void) {
 	ADC1_ISC_R = 0x08;
 	ADCvalue2 = ADC1_SSFIFO3_R;
+	IR_R = ADCvalue2&0xFFF;
 }

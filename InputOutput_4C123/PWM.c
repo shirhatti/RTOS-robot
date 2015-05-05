@@ -38,12 +38,17 @@ void GPIO_PortF_Init(void)
 	SYSCTL_RCGCGPIO_R |= SYSCTL_RCGC2_GPIOF;
 	delay = SYSCTL_RCGCGPIO_R;
 	
-	GPIO_PORTF_DIR_R |= 0x0F; // PF0-3 output
-	GPIO_PORTF_DEN_R |= 0x0F; // enable Digital IO on PF0-3
-	GPIO_PORTF_AFSEL_R &= ~0x0F; // PF0-3 alt funct disable
-	GPIO_PORTF_AMSEL_R &= ~0x0F; // disable analog functionality on PF0-3
+//	GPIO_PORTF_DIR_R |= 0x0F; // PF0-3 output
+//	GPIO_PORTF_DEN_R |= 0x0F; // enable Digital IO on PF0-3
+//	GPIO_PORTF_AFSEL_R &= ~0x0F; // PF0-3 alt funct disable
+//	GPIO_PORTF_AMSEL_R &= ~0x0F; // disable analog functionality on PF0-3
 	
-	GPIO_PORTF_DATA_R = 0x06;
+	GPIO_PORTF_DIR_R |= 0x0C; // PF0-3 output
+	GPIO_PORTF_DEN_R |= 0x0C; // enable Digital IO on PF0-3
+	GPIO_PORTF_AFSEL_R &= ~0x0C; // PF0-3 alt funct disable
+	GPIO_PORTF_AMSEL_R &= ~0x0C; // disable analog functionality on PF0-3
+	
+	GPIO_PORTF_DATA_R = 0x0C;
 }
 
 // period is 16-bit number of PWM clock cycles in one period (3<=period)

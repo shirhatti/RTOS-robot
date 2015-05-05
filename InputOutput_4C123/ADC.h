@@ -2,7 +2,7 @@
 #define ADC_H
 #include <stdint.h>
 
-extern uint32_t IR_L;
+extern uint32_t IR_L, IR_R;
 
 void ADC0_InitTimer3ATriggerSeq3PD3(uint32_t period);
 

@@ -62,6 +62,7 @@ int static MailFlag;
 uint32_t button1Pressed = 0;
 uint32_t button2Pressed = 0;
 uint32_t Mailbox = 4000000, Mailbox2 = 9900000, Mailbox3 = 9900000, Mailbox4 = 9900000;
+uint32_t Mailbox5 = 9900000, Mailbox6 = 9900000;
 
 //*****************************************************************************
 //
@@ -101,6 +102,7 @@ void CAN0_Handler(void){ uint8_t data[4];
 					//add thread that compensates for wall hit
 				}else if(xTempMsgObject.ulMsgID == IR_ID){
 					temp = (data[0]<<24) + (data[1]<<16) + (data[2]<<8) + data[3];
+					Mailbox5 = temp;
 				}
       }
     }
